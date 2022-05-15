@@ -4,10 +4,9 @@ import com.bring.voucher.model.Voucher;
 import com.bring.voucher.rest.dto.VoucherDto;
 import com.bring.voucher.service.VoucherService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/v1/voucher")
@@ -15,13 +14,23 @@ import reactor.core.publisher.Flux;
 public class VoucherController {
     private final VoucherService voucherService;
 
-    @RequestMapping("/all")
+    @GetMapping("/all")
     public Flux<VoucherDto> getAllVouchers(){
         return voucherService.getAllVouchers().map(Voucher::toDto);
     }
 
-    @RequestMapping("/all")
+    @GetMapping("/all-active")
     public Flux<VoucherDto> getAllActiveVouchers(){
         return voucherService.getAllActiveVouchers().map(Voucher::toDto);
+    }
+
+    @PutMapping("/add")
+    public Mono<VoucherDto> addVoucher(@RequestBody VoucherDto voucherDto){
+        return voucherService.addVoucher(voucherDto.toModel()).map(Voucher::toDto);
+    }
+
+    @DeleteMapping("/delete-all")
+    public Mono<Void> removeAllVouchers(){
+        return voucherService.removeAllVouchers();
     }
 }

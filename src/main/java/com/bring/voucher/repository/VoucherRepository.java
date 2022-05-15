@@ -10,6 +10,6 @@ import java.time.LocalDateTime;
 @Repository
 public interface VoucherRepository extends ReactiveMongoRepository<VoucherEntity, String> {
 
-    Flux<VoucherEntity> findByValidFromGreaterThanAndValidToLesserThan(LocalDateTime validFrom, LocalDateTime validTo);
+    Flux<VoucherEntity> findByValidFromGreaterThanAndValidToLessThan(LocalDateTime validFrom, LocalDateTime validTo);
 
 }

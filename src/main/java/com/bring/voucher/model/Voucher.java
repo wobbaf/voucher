@@ -22,7 +22,7 @@ public class Voucher {
     private String voucherCode;
 
     public VoucherEntity toEntity(){
-        VoucherEntity voucherEntity = VoucherEntity.builder().build();
+        VoucherEntity voucherEntity = new VoucherEntity();
         BeanUtils.copyProperties(this, voucherEntity);
         return voucherEntity;
     }
