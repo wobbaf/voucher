@@ -8,9 +8,11 @@ import com.bring.voucher.service.VoucherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RestController
@@ -24,9 +26,19 @@ public class VoucherController {
         return voucherService.getAllVouchers().map(Voucher::toDto);
     }
 
+    @GetMapping("/")
+    public Flux<VoucherDto> getVoucher(@RequestBody UserVoucherDto userVoucherDto){
+        return voucherService.getVoucherByIdAndWalletId(userVoucherDto.toModel()).map(Voucher::toDto);
+    }
+
     @GetMapping("/all-active")
     public Flux<VoucherDto> getAllActiveVouchers(){
         return voucherService.getAllActiveVouchers().map(Voucher::toDto);
+    }
+
+    @GetMapping("/all-in-range")
+    public Flux<VoucherDto> getAllInRangeVouchers(@RequestParam LocalDateTime start, @RequestParam LocalDateTime end){
+        return voucherService.getAllInRange(start, end).map(Voucher::toDto);
     }
 
     @GetMapping("/all-wallet")
@@ -47,6 +59,14 @@ public class VoucherController {
         return voucherService.assignVoucher(voucherDto.toModel()).map(UserVoucher::toDto);
     }
 
+    @PutMapping("/delete-from-wallet")
+    public Mono<Void> deleteFromWallet(@RequestBody UserVoucherDto voucherDto){
+        if(StringUtils.hasText(voucherDto.getId())){
+            return Mono.error(new Exception("ID is required"));
+        }
+        return voucherService.deleteVoucherFromWallet(voucherDto.toModel());
+    }
+
     @PostMapping("/viewed")
     public Mono<Void> increaseViewsCount(@RequestParam String voucherId){
         return voucherService.increaseViewsCount(voucherId);
@@ -60,5 +80,10 @@ public class VoucherController {
     @DeleteMapping("/delete-all")
     public Mono<Void> removeAllVouchers(){
         return voucherService.removeAllVouchers();
+    }
+
+    @DeleteMapping("/delete-all-from-wallet")
+    public Mono<Void> removeAllVouchersFromWallet(@RequestParam String walletId){
+        return voucherService.removeAllVouchersFromWallet(walletId);
     }
 }

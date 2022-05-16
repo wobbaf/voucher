@@ -19,6 +19,7 @@ public class UserVoucherEntity {
     private String id;
     private String voucherId;
     private String walletId;
+    private Boolean active;
 
     public UserVoucher toModel(){
         UserVoucher voucher = new UserVoucher();
