@@ -1,7 +1,10 @@
 package com.bring.voucher.service;
 
+import com.bring.voucher.entity.UserVoucherEntity;
 import com.bring.voucher.entity.VoucherEntity;
+import com.bring.voucher.model.UserVoucher;
 import com.bring.voucher.model.Voucher;
+import com.bring.voucher.repository.UserVoucherRepository;
 import com.bring.voucher.repository.VoucherRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,7 @@ import java.util.Optional;
 public class VoucherService {
 
     private final VoucherRepository voucherRepository;
+    private final UserVoucherRepository userVoucherRepository;
 
     public Flux<Voucher> getAllVouchers(){
         return voucherRepository.findAll().map(VoucherEntity::toModel);
@@ -32,5 +36,24 @@ public class VoucherService {
 
     public Mono<Void> removeAllVouchers() {
         return voucherRepository.deleteAll();
+    }
+
+    public Mono<UserVoucher> assignVoucher(UserVoucher userVoucher) {
+        return userVoucherRepository.save(userVoucher.toEntity()).map(UserVoucherEntity::toModel);
+    }
+
+    public Flux<Voucher> getVouchersByWalletId(String walletId) {
+        return voucherRepository.findAllById(userVoucherRepository.findByWalletId(walletId).map(UserVoucherEntity::getVoucherId))
+                .map(VoucherEntity::toModel);
+    }
+
+    public Mono<Void> increaseViewsCount(String voucherId) {
+        return voucherRepository.saveAll(voucherRepository.findById(voucherId)
+                .doOnNext(voucherEntity -> voucherEntity.setViews(voucherEntity.getViews() + 1))).then();
+    }
+
+    public Mono<Void> increaseRedeemedCount(String voucherId) {
+        return voucherRepository.saveAll(voucherRepository.findById(voucherId)
+                .doOnNext(voucherEntity -> voucherEntity.setViews(voucherEntity.getUsersRedeemed() + 1))).then();
     }
 }
