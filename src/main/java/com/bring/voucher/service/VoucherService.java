@@ -7,14 +7,11 @@ import com.bring.voucher.model.Voucher;
 import com.bring.voucher.repository.UserVoucherRepository;
 import com.bring.voucher.repository.VoucherRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -62,9 +59,11 @@ public class VoucherService {
                 .doOnNext(voucherEntity -> voucherEntity.setViews(voucherEntity.getViews() + 1))).then();
     }
 
-    public Mono<Void> increaseRedeemedCount(String voucherId) {
-        return voucherRepository.saveAll(voucherRepository.findById(voucherId)
-                .doOnNext(voucherEntity -> voucherEntity.setViews(voucherEntity.getUsersRedeemed() + 1))).then();
+    public Mono<Void> redeemVoucher(UserVoucher userVoucher) {
+        return voucherRepository.saveAll(voucherRepository.findById(userVoucher.getVoucherId())
+                .doOnNext(voucherEntity -> voucherEntity.setViews(voucherEntity.getUsersRedeemed() + 1))).then(
+
+        );
     }
 
     public Flux<Voucher> getAllInRange(LocalDateTime start, LocalDateTime end) {

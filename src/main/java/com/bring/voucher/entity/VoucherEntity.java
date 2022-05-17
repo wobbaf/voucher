@@ -28,7 +28,6 @@ public class VoucherEntity {
     private BigDecimal discountValue;
     private Long views;
     private Long usersRedeemed;
-    private String voucherCode;
 
     public Voucher toModel(){
         Voucher voucher = new Voucher();
